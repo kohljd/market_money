@@ -7,26 +7,29 @@ describe "Vendors API" do
         get "/api/v0/vendors/#{id}"
       
         vendor = JSON.parse(response.body, symbolize_names: true)
-      
+        
         expect(response).to be_successful
+
+        expect(vendor).to have_key(:data)
+        expect(vendor[:data]).to have_key(:type) 
+
+        expect(vendor[:data]).to have_key(:id)
+        expect(vendor[:data][:id]).to eq("#{id}")
       
-        expect(vendor).to have_key(:id)
-        expect(vendor[:id]).to eq(id)
+        expect(vendor[:data][:attributes]).to have_key(:name)
+        expect(vendor[:data][:attributes][:name]).to be_a(String)
       
-        expect(vendor).to have_key(:name)
-        expect(vendor[:name]).to be_a(String)
+        expect(vendor[:data][:attributes]).to have_key(:description)
+        expect(vendor[:data][:attributes][:description]).to be_a(String)
       
-        expect(vendor).to have_key(:description)
-        expect(vendor[:description]).to be_a(String)
+        expect(vendor[:data][:attributes]).to have_key(:contact_name)
+        expect(vendor[:data][:attributes][:contact_name]).to be_a(String)
       
-        expect(vendor).to have_key(:contact_name)
-        expect(vendor[:contact_name]).to be_a(String)
+        expect(vendor[:data][:attributes]).to have_key(:contact_phone)
+        expect(vendor[:data][:attributes][:contact_phone]).to be_a(String)
       
-        expect(vendor).to have_key(:contact_phone)
-        expect(vendor[:contact_phone]).to be_a(String)
-      
-        expect(vendor).to have_key(:credit_accepted)
-        expect([true, false]).to include(vendor[:credit_accepted])
+        expect(vendor[:data][:attributes]).to have_key(:credit_accepted)
+        expect([true, false]).to include(vendor[:data][:attributes][:credit_accepted])
       end
 
       it "can get one vendor by its id sad path" do

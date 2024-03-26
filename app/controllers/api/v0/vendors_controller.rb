@@ -4,7 +4,8 @@ class Api::V0::VendorsController < ApplicationController
     # end
     def show
         vendor = Vendor.find(params[:id])
-        render json: vendor
+        # render json: vendor
+        render json: VendorSerializer.new(vendor)
       rescue ActiveRecord::RecordNotFound
         render json: { errors: [{ detail: "Vendor with id=#{params[:id]} not found" }] }, status: :not_found
       end
