@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     namespace :v0 do
+      resources :markets, only: [:index]
       resources :vendors, only: [:show]
     end
   end
