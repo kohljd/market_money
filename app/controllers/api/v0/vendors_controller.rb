@@ -28,6 +28,11 @@ class Api::V0::VendorsController < ApplicationController
     render json: VendorSerializer.new(updated_vendor)
   end
 
+  def destroy
+    vendor = Vendor.find(params[:id])
+    vendor.delete
+  end
+
 
   private
   def find_market_and_vendors

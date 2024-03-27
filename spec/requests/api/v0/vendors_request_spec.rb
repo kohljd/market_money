@@ -148,4 +148,36 @@ describe "Vendors API" do
     expect(vendor[:errors].first).to have_key(:detail)
     expect(vendor[:errors].first[:detail]).to eq("Validation failed: Name can't be blank")
   end
+
+  it "can destroy a vendor" do
+    vendor = create(:vendor)
+  
+    expect(Vendor.count).to eq(1)
+  
+    delete "/api/v0/vendors/#{vendor.id}"
+  
+    expect(response).to be_successful
+    expect(Vendor.count).to eq(0)
+    expect{Vendor.find(vendor.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  end
+
+  it "can destroy a vendor sad" do
+    id = create(:vendor).id
+  
+    expect(Vendor.count).to eq(1)
+  
+    delete "/api/v0/vendors/#{id+1}"
+    vendor = JSON.parse(response.body, symbolize_names: true)
+    
+    expect(response).to_not be_successful
+
+    expect(Vendor.count).to eq(1)
+    expect(vendor).to be_a(Hash)
+    expect(vendor).to have_key(:errors)
+    expect(vendor[:errors]).to be_an(Array)
+    expect(vendor[:errors].first).to be_a(Hash)
+    expect(vendor[:errors].first).to have_key(:detail)
+    expect(vendor[:errors].first[:detail]).to include("Vendor with 'id'=")
+   
+  end
 end
