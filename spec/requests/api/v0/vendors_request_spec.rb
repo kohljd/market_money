@@ -2,7 +2,9 @@ require 'rails_helper'
 
 describe "Vendors API" do
   it "can get one vendor by its id happy path" do
-    id = create(:vendor).id
+    vendor_1 = create(:vendor)
+    id = vendor_1.id
+    # binding.pry
       
     get "/api/v0/vendors/#{id}"
       
@@ -33,7 +35,7 @@ describe "Vendors API" do
   end
 
 
-  it "can get one vendor by its id sad path" do
+  it "returns error if vendor id is invalid" do
     id = create(:vendor).id
   
     get "/api/v0/vendors/#{id+1}"
@@ -47,7 +49,7 @@ describe "Vendors API" do
     expect(vendor[:errors]).to be_an(Array)
     expect(vendor[:errors].first).to be_a(Hash)
     expect(vendor[:errors].first).to have_key(:detail)
-    expect(vendor[:errors].first[:detail]).to include("Vendor with id=")
+    expect(vendor[:errors].first[:detail]).to include("Vendor with 'id'=")
   end
 
   it "can create a new vendor" do
@@ -60,15 +62,41 @@ describe "Vendors API" do
                   })
     headers = {"CONTENT_TYPE" => "application/json"}
   
-    # We include this header to make sure that these params are passed as JSON rather than as plain text
+   
     post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
     created_vendor = Vendor.last
-    # binding.pry
+    
     expect(response).to be_successful
+    expect(response.status).to eq(201)
     expect(created_vendor.name).to eq(vendor_params[:name])
     expect(created_vendor.description).to eq(vendor_params[:description])
     expect(created_vendor.contact_name).to eq(vendor_params[:contact_name])
     expect(created_vendor.contact_phone).to eq(vendor_params[:contact_phone])
     expect(created_vendor.credit_accepted).to eq(vendor_params[:credit_accepted])
+  end
+
+  it "returns error if given invalid params to create a vendor" do
+    vendor_params = ({
+                    name: '',
+                    description: '',
+                    contact_name: '',
+                    contact_phone: '',
+                    credit_accepted: ''
+                  })
+    headers = {"CONTENT_TYPE" => "application/json"}
+    post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
+  
+    vendor = JSON.parse(response.body, symbolize_names: true)
+    # binding.pry
+  
+    expect(response).to_not be_successful
+    expect(response.status).to eq(400)
+
+    expect(vendor).to be_a(Hash)
+    expect(vendor).to have_key(:errors)
+    expect(vendor[:errors]).to be_an(Array)
+    expect(vendor[:errors].first).to be_a(Hash)
+    expect(vendor[:errors].first).to have_key(:detail)
+    expect(vendor[:errors].first[:detail]).to eq("Validation failed: Name can't be blank, Description can't be blank, Contact name can't be blank, Contact phone can't be blank")
   end
 end
