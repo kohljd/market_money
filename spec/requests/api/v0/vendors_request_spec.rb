@@ -99,4 +99,53 @@ describe "Vendors API" do
     expect(vendor[:errors].first).to have_key(:detail)
     expect(vendor[:errors].first[:detail]).to eq("Validation failed: Name can't be blank, Description can't be blank, Contact name can't be blank, Contact phone can't be blank")
   end
+
+  it "updates an existing vendor happy" do
+    id = create(:vendor).id
+    previous_name = Vendor.last.name
+    vendor_params = { name: "Web" }
+    headers = {"CONTENT_TYPE" => "application/json"}
+  
+    patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
+    vendor = Vendor.find_by(id: id)
+  
+    expect(response).to be_successful
+    expect(vendor.name).to_not eq(previous_name)
+    expect(vendor.name).to eq("Web")
+  end
+
+  it "updates an existing vendor sad" do
+    id = create(:vendor).id
+    vendor_params = { name: "Web" }
+    headers = {"CONTENT_TYPE" => "application/json"}
+  
+    patch "/api/v0/vendors/#{id+1}", headers: headers, params: JSON.generate({vendor: vendor_params})
+    vendor = JSON.parse(response.body, symbolize_names: true)
+
+    expect(vendor).to be_a(Hash)
+    expect(vendor).to have_key(:errors)
+    expect(vendor[:errors]).to be_an(Array)
+    expect(vendor[:errors].first).to be_a(Hash)
+    expect(vendor[:errors].first).to have_key(:detail)
+    expect(vendor[:errors].first[:detail]).to include("Vendor with 'id'=")
+  end
+
+  it "updates an existing vendor sad validation" do
+    id = create(:vendor).id
+    vendor_params = { name: "" }
+    headers = {"CONTENT_TYPE" => "application/json"}
+  
+    patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
+    vendor = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(400)
+
+    expect(vendor).to be_a(Hash)
+    expect(vendor).to have_key(:errors)
+    expect(vendor[:errors]).to be_an(Array)
+    expect(vendor[:errors].first).to be_a(Hash)
+    expect(vendor[:errors].first).to have_key(:detail)
+    expect(vendor[:errors].first[:detail]).to eq("Validation failed: Name can't be blank")
+  end
 end
