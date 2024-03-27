@@ -53,6 +53,31 @@ describe "Market API" do
     expect(market[:attributes][:vendor_count]).to be_an(Integer)
   end
 
+  it "sends list of a market's vendors" do
+    market_1 = create(:market)
+    market_1.vendors << create_list(:vendor, 5)
+
+    get "/api/v0/markets/#{market_1.id}/vendors"
+
+    expect(response).to be_successful
+    
+    formatted_response = JSON.parse(response.body, symbolize_names: true)
+    vendors = formatted_response[:data]
+
+    expect(vendors.count).to eq(5)
+
+    vendors.each do |vendor|
+      expect(vendor).to include(:id, :type, :attributes)
+      expect(vendor[:id]).to be_a(String)
+      expect(vendor[:type]).to be_a(String)
+      expect(vendor[:attributes]).to be_a(Hash)
+
+      expect(vendor[:attributes]).to have_attributes_for(:vendor)
+      expect(market[:attributes].except(:credit_accepted).values).to all(be_a(String))
+      expect(market[:attributes][:credit_accepted]).to be_a(Boolean)
+    end
+  end
+
   it "returns error message when given invalid market id" do
     get "/api/v0/markets/1"
 
