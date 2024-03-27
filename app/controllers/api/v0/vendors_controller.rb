@@ -8,36 +8,33 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def show
-    vendor = Vendor.find(params[:id])
-    render json: VendorSerializer.new(vendor)
+    find_vendor
+    render json: VendorSerializer.new(@vendor)
   end
 
   def create
-    # require 'pry'; binding.pry
-    # begin
       new_vendor = Vendor.create!(vendor_params)
       render json: VendorSerializer.new(new_vendor), status: :created
-    # rescue ActiveRecord::RecordInvalid => invalid
-    #   render json: ErrorSerializer.format_error(invalid), status: :bad_request
-    # end
   end
 
   def update
-    # binding.pry
     updated_vendor = Vendor.update!(params[:id], vendor_params)
     render json: VendorSerializer.new(updated_vendor)
   end
 
   def destroy
-    vendor = Vendor.find(params[:id])
-    vendor.delete
+    find_vendor
+    @vendor.delete
   end
-
 
   private
   def find_market_and_vendors
     @market = Market.find(params[:market_id])
     @vendors = @market.vendors
+  end
+
+  def find_vendor
+    @vendor = Vendor.find(params[:id])
   end
 
   def not_found_error(exception)
