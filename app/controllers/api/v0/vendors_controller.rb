@@ -22,6 +22,11 @@ class Api::V0::VendorsController < ApplicationController
     # end
   end
 
+  def update
+    # binding.pry
+    updated_vendor = Vendor.update!(params[:id], vendor_params)
+    render json: VendorSerializer.new(updated_vendor)
+  end
 
 
   private
