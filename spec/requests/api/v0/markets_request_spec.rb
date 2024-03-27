@@ -98,4 +98,18 @@ describe "Market API" do
     expect(market[:attributes]).to have_key(:vendor_count)
     expect(market[:attributes][:vendor_count]).to be_an(Integer)
   end
+
+  it "returns error message when given invalid market id" do
+    get "/api/v0/markets/1"
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq 404
+
+    formatted_response = JSON.parse(response.body, symbolize_names: true)
+    error_response = formatted_response[:errors]
+
+    expect(error_response).to be_an(Array)
+    expect(error_response.first).to have_key(:detail)
+    expect(error_response.first[:detail]).to start_with("Couldn't find Market with 'id'=")
+  end
 end
