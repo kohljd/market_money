@@ -72,9 +72,11 @@ describe "Market API" do
       expect(vendor[:type]).to be_a(String)
       expect(vendor[:attributes]).to be_a(Hash)
 
-      expect(vendor[:attributes]).to have_attributes_for(:vendor)
-      expect(market[:attributes].except(:credit_accepted).values).to all(be_a(String))
-      expect(market[:attributes][:credit_accepted]).to be_a(Boolean)
+      expect(vendor[:attributes]).to include(
+        :name, :description, :contact_name, :contact_phone, :credit_accepted
+      )
+      expect(vendor[:attributes].except(:credit_accepted).values).to all(be_a(String))
+      expect(vendor[:attributes][:credit_accepted]).to be_a(FalseClass).or(be_a(TrueClass))
     end
   end
 
