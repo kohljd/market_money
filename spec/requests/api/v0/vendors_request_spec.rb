@@ -32,7 +32,6 @@ describe "Vendors API" do
     expect([true, false]).to include(vendor[:data][:attributes][:credit_accepted])
   end
 
-
   it "can get one vendor by its id sad path" do
     id = create(:vendor).id
   
@@ -47,6 +46,6 @@ describe "Vendors API" do
     expect(vendor[:errors]).to be_an(Array)
     expect(vendor[:errors].first).to be_a(Hash)
     expect(vendor[:errors].first).to have_key(:detail)
-    expect(vendor[:errors].first[:detail]).to include("Vendor with id=")
+    expect(vendor[:errors].first[:detail]).to include("Vendor with 'id'=")
   end
 end
