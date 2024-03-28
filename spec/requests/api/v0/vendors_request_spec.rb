@@ -87,7 +87,6 @@ describe "Vendors API" do
     post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
   
     vendor = JSON.parse(response.body, symbolize_names: true)
-    # binding.pry
   
     expect(response).to_not be_successful
     expect(response.status).to eq(400)
