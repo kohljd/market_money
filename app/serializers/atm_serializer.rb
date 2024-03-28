@@ -3,7 +3,7 @@ class AtmSerializer
     {
       data: atms.map do |atm|
         {
-          id: "null",
+          id: nil,
           type: "atm",
           attributes: {
               name: atm.name,

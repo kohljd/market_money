@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       resources :vendors, only: [:show, :create, :update, :destroy]
       resources :markets, only: [:index, :show] do
         resources :vendors, only: [:index]
+        resources :nearest_atms, only: [:index], controller: :atms
       end
       resource :market_vendors, only: [:create, :destroy]
     end
