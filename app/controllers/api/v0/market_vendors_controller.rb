@@ -4,13 +4,23 @@ class Api::V0::MarketVendorsController < ApplicationController
   def create
     return params_missing_error if params_missing?
     
-    find_market_and_vendor
+    # find_market_and_vendor
     if existing_market_vendor?
       error_message = "Validation failed: Market vendor asociation already exists"
       render json: ErrorSerializer.format_error(error_message), status: :unprocessable_entity #422
     else
       @market_vendor = MarketVendor.create(market_vendor_params)
       render json: {message: "Successfully added vendor to market"}, status: :created
+    end
+  end
+
+  def destroy
+    if existing_market_vendor?
+      find_market_vendor
+      @market_vendor.delete
+    else
+      error_message = "No market vendor asociation between market_id=#{@market.id} and vendor_id=#{@vendor.id}"
+      not_found_error(error_message)
     end
   end
 
@@ -25,7 +35,13 @@ class Api::V0::MarketVendorsController < ApplicationController
   end
 
   def existing_market_vendor?
+    find_market_and_vendor
     MarketVendor.exists?(market_id: @market.id, vendor_id: @vendor.id)
+  end
+
+  def find_market_vendor
+    find_market_and_vendor
+    @market_vendor = MarketVendor.find_by(market_vendor_params)
   end
 
   def find_market_and_vendor
