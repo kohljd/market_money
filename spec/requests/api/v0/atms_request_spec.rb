@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe "Market API" do
+describe "ATM API" do
   it "can list atms near a market's location" do
     market_1 = create(:market)
 
