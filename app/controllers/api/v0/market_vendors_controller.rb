@@ -3,8 +3,7 @@ class Api::V0::MarketVendorsController < ApplicationController
 
   def create
     return params_missing_error if params_missing?
-    
-    # find_market_and_vendor
+
     if existing_market_vendor?
       error_message = "Validation failed: Market vendor asociation already exists"
       render json: ErrorSerializer.format_error(error_message), status: :unprocessable_entity #422
@@ -31,7 +30,7 @@ class Api::V0::MarketVendorsController < ApplicationController
   end
 
   def params_missing?
-    (params[:market_id] && params[:vendor_id]).blank?
+    (params[:market_id] || params[:vendor_id]).blank?
   end
 
   def existing_market_vendor?
