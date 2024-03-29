@@ -33,4 +33,17 @@ describe "Market API" do
     atms_by_distance = atms.sort_by { |atm| atm[:attributes][:distance]}
     expect(atms).to eq(atms_by_distance)
   end
+
+  it "returns error if invalid market id for finding atms" do
+    get "/api/v0/markets/1/nearest_atms"
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq 404
+
+    formatted_response = JSON.parse(response.body, symbolize_names: true)
+    error_response = formatted_response[:errors]
+    expect(error_response).to be_an(Array)
+    expect(error_response.first).to have_key(:detail)
+    expect(error_response.first[:detail]).to start_with("Couldn't find Market with 'id'=")
+  end
 end
